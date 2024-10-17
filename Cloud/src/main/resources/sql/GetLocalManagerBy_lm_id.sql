@@ -1,0 +1,1 @@
+SELECT * FROM local_manager_data WHERE lm_id = ?;

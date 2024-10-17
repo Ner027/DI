@@ -1,0 +1,1 @@
+INSERT INTO factory_data (<factory_name>, <coord_long>, <coord_lat>) values (?, ?, ?);

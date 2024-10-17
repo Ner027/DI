@@ -1,0 +1,1 @@
+SELECT * FROM sensor_data WHERE sens_id = ?;

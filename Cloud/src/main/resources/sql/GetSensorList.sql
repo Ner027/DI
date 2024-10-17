@@ -1,0 +1,1 @@
+SELECT * FROM sensor_data WHERE parent_lm_id = ?;

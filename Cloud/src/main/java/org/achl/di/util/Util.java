@@ -76,7 +76,7 @@ public class Util
         System.exit(-1);
     }
 
-    public static JSONArray dumpListToJson(String queryName, JSONSerializer jsonSerializer, Object ... queryParams)
+    public static JSONArray dumpListToJson(String queryName, SerializableObject serializableObject, Object ... queryParams)
             throws SQLException, JSONException, IllegalAccessException
     {
         JSONArray jArr = new JSONArray();
@@ -85,7 +85,8 @@ public class Util
         ResultSet resultSet = pStat.executeQuery();
         while (resultSet.next())
         {
-            jArr.put(jsonSerializer.toJson(resultSet));
+            serializableObject.loadFromSet(resultSet);
+            jArr.put(serializableObject.dumpToJson());
         }
 
         return jArr;

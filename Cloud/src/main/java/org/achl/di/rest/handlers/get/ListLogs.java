@@ -5,6 +5,7 @@ import io.javalin.http.HandlerType;
 import io.javalin.http.HttpResponseException;
 import io.javalin.http.HttpStatus;
 import org.achl.di.entities.types.Sensor;
+import org.achl.di.entities.types.SensorLog;
 import org.achl.di.enums.RequestErrorCause;
 import org.achl.di.rest.exceptions.RequestException;
 import org.achl.di.rest.handlers.IHandler;
@@ -48,7 +49,7 @@ public class ListLogs implements IHandler
         try
         {
             JSONArray jArr = Util.dumpListToJson("GetLogList",
-                    new LogSerializer(),
+                    new SensorLog(),
                     parentSensor.getId(),
                     Long.parseLong(startTime),
                     Long.parseLong(endTime));

@@ -1,0 +1,1 @@
+SELECT * FROM sensor_logs WHERE parent_sens_id = ? ORDER BY log_timestamp DESC LIMIT 1;

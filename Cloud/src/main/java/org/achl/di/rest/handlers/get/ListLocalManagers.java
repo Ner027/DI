@@ -53,7 +53,7 @@ public class ListLocalManagers implements IHandler
         try
         {
             JSONArray jArr = Util.dumpListToJson("GetLocalManagersList",
-                    new LocalManagerSerializer(),
+                    new LocalManager(),
                     parentFactory.getId());
 
             context.json(jArr.toString());

@@ -4,10 +4,7 @@ import io.javalin.Javalin;
 import jakarta.annotation.Nonnull;
 import org.achl.di.data.SettingsManager;
 import org.achl.di.rest.handlers.IHandler;
-import org.achl.di.rest.handlers.get.ListFactories;
-import org.achl.di.rest.handlers.get.ListLocalManagers;
-import org.achl.di.rest.handlers.get.ListLogs;
-import org.achl.di.rest.handlers.get.ListSensors;
+import org.achl.di.rest.handlers.get.*;
 import org.achl.di.rest.handlers.post.AddSensorLog;
 import org.achl.di.rest.handlers.post.RegisterFactory;
 import org.achl.di.rest.handlers.post.RegisterLocalManager;
@@ -65,7 +62,7 @@ public class RestServer
         addHandler(new ListSensors());
         addHandler(new ListLogs());
         addHandler(new ListFactories());
-
+        addHandler(new LatestLog());
         m_initComplete = true;
     }
 }

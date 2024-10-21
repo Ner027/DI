@@ -10,6 +10,7 @@ import org.achl.di.rest.exceptions.RequestException;
 import org.achl.di.rest.handlers.IHandler;
 import org.achl.di.util.Util;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AddSensorLog implements IHandler
@@ -29,8 +30,10 @@ public class AddSensorLog implements IHandler
     @Override
     public void handle(@NotNull Context context) throws Exception
     {
-        String sensId = context.formParam("sensId");
-        String logVal = context.formParam("logVal");
+        JSONObject jObj = new JSONObject(context.body());
+
+        String sensId = jObj.getString("sensId");
+        String logVal = jObj.getString("logVal");
 
         Util.validateString(sensId, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_ID);
         Util.validateString(logVal, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LOG_VAL);
@@ -48,9 +51,9 @@ public class AddSensorLog implements IHandler
         newLog.refreshTimestamp();
         newLog.insert();
 
-        JSONObject jObj = new JSONObject();
-        jObj.put("RFU", 0);
-        context.json(jObj.toString());
+        JSONObject jResponse = new JSONObject();
+        jResponse.put("RFU", 0);
+        context.json(jResponse.toString());
         context.status(HttpStatus.OK);
     }
 }

@@ -4,15 +4,17 @@ import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import io.javalin.http.HttpResponseException;
 import io.javalin.http.HttpStatus;
-import org.achl.di.entities.types.Factory;
+import org.achl.di.data.DataManager;
+import org.achl.di.entities.types.SensorLog;
 import org.achl.di.rest.handlers.IHandler;
-import org.achl.di.util.FactorySerializer;
-import org.achl.di.util.Util;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 
-public class ListFactories implements IHandler
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class LatestLog implements IHandler
 {
+
     @Override
     public HandlerType getType()
     {
@@ -22,23 +24,29 @@ public class ListFactories implements IHandler
     @Override
     public String getPath()
     {
-        return "/factory/list";
+        return "/sens/latest";
     }
 
     @Override
     public void handle(@NotNull Context context) throws Exception
     {
+        String sensId = context.queryParam("sensId");
+
         try
         {
-            JSONArray jArr = Util.dumpListToJson("GetFactoryList",
-                    new Factory());
-
-            context.json(jArr.toString());
-            context.status(HttpStatus.OK);
+            SensorLog tempLog = new SensorLog();
+            PreparedStatement pStat = DataManager.prepareStatement("GetLatestLog", sensId);
+            ResultSet resultSet = pStat.executeQuery();
+            if (resultSet.next())
+            {
+                tempLog.loadFromSet(resultSet);
+            }
+            context.json(tempLog.dumpToJson());
         }
         catch (Exception e)
         {
             throw new HttpResponseException(HttpStatus.INTERNAL_SERVER_ERROR.getCode());
         }
+
     }
 }

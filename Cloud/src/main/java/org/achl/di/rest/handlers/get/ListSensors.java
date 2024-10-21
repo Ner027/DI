@@ -5,15 +5,13 @@ import io.javalin.http.HandlerType;
 import io.javalin.http.HttpResponseException;
 import io.javalin.http.HttpStatus;
 import org.achl.di.entities.types.LocalManager;
+import org.achl.di.entities.types.Sensor;
 import org.achl.di.enums.RequestErrorCause;
 import org.achl.di.rest.exceptions.RequestException;
 import org.achl.di.rest.handlers.IHandler;
-import org.achl.di.util.LocalManagerSerializer;
-import org.achl.di.util.SensorSerializer;
 import org.achl.di.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class ListSensors implements IHandler
 {
@@ -45,7 +43,7 @@ public class ListSensors implements IHandler
         try
         {
             JSONArray jArr = Util.dumpListToJson("GetSensorList",
-                    new SensorSerializer(),
+                    new Sensor(),
                     parentManager.getId());
 
             context.json(jArr.toString());

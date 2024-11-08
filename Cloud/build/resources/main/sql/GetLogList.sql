@@ -1,0 +1,1 @@
+SELECT * FROM sensor_logs WHERE parent_sens_id = ? AND log_timestamp BETWEEN ? AND ? ORDER BY log_timestamp;

@@ -30,29 +30,28 @@ public class RegisterLocalManager implements IHandler
     @Override
     public void handle(@NotNull Context context) throws Exception
     {
-        String lmName = context.formParam("lmName");
-        String hwId = context.formParam("hwId");
-        String factoryId = context.formParam("factoryId");
+        JSONObject jObj = new JSONObject(context.body());
 
-        Util.validateString(lmName, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_FACTORY_NAME);
-        Util.validateString(hwId, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_HWID);
-        Util.validateString(factoryId, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_FACTORY_ID);
+        String lmName = jObj.getString("lmName");
+        String lmHwId = jObj.getString("hwId");
+
+        Util.validateString(lmName, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_NAME);
 
         Factory parentFactory = new Factory();
-        parentFactory.load("factory_id", Long.parseLong(factoryId));
+        parentFactory.load("factory_id", jObj.getLong("factoryId"));
         if (parentFactory.getId() < 0)
         {
             throw new RequestException(HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_FACTORY_ID);
         }
 
         LocalManager newManager = new LocalManager();
-        newManager.load("hw_id", hwId);
+        newManager.load("hw_id", lmHwId);
         if (newManager.getId() >= 0)
         {
             throw new RequestException(HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_EXISTS);
         }
 
-        if (!newManager.setHwId(hwId))
+        if (!newManager.setHwId(lmHwId))
         {
             throw new RequestException(HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_HWID);
         }
@@ -67,13 +66,13 @@ public class RegisterLocalManager implements IHandler
         try
         {
             newManager.insert();
-            newManager.load("hw_id", hwId);
+            newManager.load("hw_id", lmHwId);
             if (newManager.getId() < 0)
             {
                 throw new HttpResponseException(HttpStatus.INTERNAL_SERVER_ERROR.getCode());
             }
 
-            JSONObject jObj = new JSONObject();
+            jObj.clear();
             jObj.put("lmId", newManager.getId());
             context.json(jObj.toString());
             context.status(HttpStatus.CREATED);

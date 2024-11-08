@@ -62,6 +62,13 @@ public class Util
             throw new RequestException(status, cause);
     }
 
+    public static void validateKey(JSONObject jsonObject, String key, HttpStatus status, RequestErrorCause cause) throws RequestException
+    {
+        if (!jsonObject.has(key))
+            throw new RequestException(status, cause);
+    }
+
+
     public static String b64Encode(String src)
     {
         return new String(Base64.getEncoder().encode(src.getBytes()));

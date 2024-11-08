@@ -32,14 +32,11 @@ public class AddSensorLog implements IHandler
     {
         JSONObject jObj = new JSONObject(context.body());
 
-        String sensId = jObj.getString("sensId");
-        String logVal = jObj.getString("logVal");
-
-        Util.validateString(sensId, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_ID);
-        Util.validateString(logVal, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LOG_VAL);
+        Long sensId = jObj.getLong("sensId");
+        double logVal = jObj.getDouble("logVal");
 
         Sensor parentSensor = new Sensor();
-        parentSensor.load("sens_id", Long.parseLong(sensId));
+        parentSensor.load("sens_id", sensId);
         if (parentSensor.getId() < 0)
         {
             throw new RequestException(HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_ID);
@@ -47,7 +44,7 @@ public class AddSensorLog implements IHandler
 
         SensorLog newLog = new SensorLog();
         newLog.setParentId(parentSensor.getId());
-        newLog.setValue(Float.parseFloat(logVal));
+        newLog.setValue((float) logVal);
         newLog.refreshTimestamp();
         newLog.insert();
 

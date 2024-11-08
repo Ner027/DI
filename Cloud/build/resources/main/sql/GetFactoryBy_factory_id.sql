@@ -1,0 +1,1 @@
+SELECT * FROM factory_data WHERE factory_id = ?;

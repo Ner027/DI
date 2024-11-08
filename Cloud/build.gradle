@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+application.mainClass = 'org.achl.di.Main'
+group = 'org.achl.di'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+shadowJar {
+    archiveFileName = 'CloudDI.jar'
+}
+
+dependencies {
+    implementation 'org.json:json:20231013'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'org.postgresql:postgresql:42.7.2'
+    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+    //Vulnerable
+    implementation 'io.javalin:javalin:6.3.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.incremental = true
+}

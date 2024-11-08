@@ -48,6 +48,16 @@ public class Sensor extends SerializableObject
         return m_sensId;
     }
 
+    public int getStatus()
+    {
+        return m_sensStatus;
+    }
+
+    public int getType()
+    {
+        return m_sensType;
+    }
+
     public void setSensorType(int newType)
     {
         m_sensType = newType;

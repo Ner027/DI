@@ -63,6 +63,10 @@ public class RestServer
         addHandler(new ListLogs());
         addHandler(new ListFactories());
         addHandler(new LatestLog());
+        addHandler(new SensorDetails());
+        addHandler(new LocalManagerDetails());
+        addHandler(new FactoryDetails());
+
         m_initComplete = true;
     }
 }

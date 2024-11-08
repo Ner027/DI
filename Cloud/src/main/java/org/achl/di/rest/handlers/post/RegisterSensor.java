@@ -30,26 +30,25 @@ public class RegisterSensor implements IHandler
     @Override
     public void handle(@NotNull Context context) throws Exception
     {
-        String sensName = context.formParam("sensName");
-        String sensType = context.formParam("sensType");
-        String lmId = context.formParam("lmId");
+        JSONObject jObj = new JSONObject(context.body());
 
-        Util.validateString(sensName, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_NAME);
-        Util.validateString(sensType, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_TYPE);
-        Util.validateString(lmId, HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_EXISTS);
+        Util.validateKey(jObj, "sensName", HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_NAME);
+        Util.validateKey(jObj, "sensType", HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_SENS_TYPE);
+        Util.validateKey(jObj, "lmId", HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_ID);
+
 
         LocalManager parentManager = new LocalManager();
-        parentManager.load("lm_id", Long.parseLong(lmId));
+        parentManager.load("lm_id", jObj.getLong("lmId"));
         if (parentManager.getId() < 0)
         {
             throw new RequestException(HttpStatus.FORBIDDEN, RequestErrorCause.INVALID_LM_ID);
         }
 
         Sensor newSensor = new Sensor();
-        newSensor.setName(sensName);
+        newSensor.setName(jObj.getString("sensName"));
         newSensor.setParentId(parentManager.getId());
         newSensor.setSensorStatus((short)0);
-        newSensor.setSensorType(Short.parseShort(sensType));
+        newSensor.setSensorType(jObj.getInt("sensType"));
 
         long newId = newSensor.insertReadBack("sens_id");
         if (newId < 0)
@@ -57,9 +56,9 @@ public class RegisterSensor implements IHandler
             throw new HttpResponseException(HttpStatus.INTERNAL_SERVER_ERROR.getCode());
         }
 
-        JSONObject jObj = new JSONObject();
-        jObj.put("sensId", newId);
-        context.json(jObj.toString());
+        JSONObject retObj = new JSONObject();
+        retObj.put("sensId", newId);
+        context.json(retObj.toString());
         context.status(HttpStatus.CREATED);
     }
 }

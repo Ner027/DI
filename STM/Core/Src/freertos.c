@@ -26,11 +26,35 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "si7021.h"
+#include "tca9548.h"
+
+#define SAMPLING_TIME 	1000
+#define SI7021_NUMBER	2
+#define SENSORS_NUMBER	4
+
 typedef struct
 {
     uint32_t sensorId;
     float sensorData;
+    float (*readFunc)(si7021_st* sensor);
+    si7021_st* sensorPtr;
 }sensor_data_st;
+
+
+void initSensorData(sensor_data_st* sensorData, uint32_t id, float (*readFunc)(si7021_st*), si7021_st* sensorPtr) 
+{
+    sensorData->sensorId = id;
+    sensorData->readFunc = readFunc;
+    sensorData->sensorPtr = sensorInstance;
+}
+
+
+float readSensorData(sensor_data_st* sensorData) 
+{
+    return sensorData->readFunc(sensorData->sensorPtr);
+}
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -124,8 +148,6 @@ void StartDefaultTask(void *argument)
     /* init code for LWIP */
     MX_LWIP_Init();
 
-
-
     osDelay(3000);
 
     UA_Client *pClient = UA_Client_new();
@@ -146,17 +168,37 @@ void StartDefaultTask(void *argument)
     UA_Int32 retInt;
     retInt = *(UA_Int32 *) value.data;
 
-    sensor_data_st sensorData = {0};
-    sensorData.sensorId = 0x55;
+    si7021_st si7021Sensors[SI7021_NUMBER]; 
+    setChannel(&si7021Sensors[0], 1);
+    setChannel(&si7021Sensors[1], 2);
+    
+    sensor_data_st systemSensors[SENSORS_NUMBER];
+    
+    //bit 16-12   - manufactoring line
+    //bit 11-8	  - type (00 tempertaure / 01 humidity)
+    //last 8 bits - index
+    initSensorData(&systemSensors[0], 0x00000000, readTemperature, &si7021Sensors[0]);
+    initSensorData(&systemSensors[1], 0x00000100, readHumidity, &si7021Sensors[0]);
+    initSensorData(&systemSensors[2], 0x00000001, readTemperature, &si7021Sensors[1]);
+    initSensorData(&systemSensors[3], 0x00000101, readHumidity, &si7021Sensors[1]);  
+    
+
     /* USER CODE BEGIN StartDefaultTask */
     /* Infinite loop */
     for (;;)
     {
-        sensorData.sensorData += 1.5f;
-        printf("Writing: %f\n", sensorData.sensorData);
-        UA_Variant_setScalar(&value, &sensorData, &UA_TYPES[UA_TYPES_UINT64]);
-        UA_Client_writeValueAttribute(pClient, nodeId, &value);
-        osDelay(1000);
+    	for(uint8_t i = 0; i < SENSORS_NUMBER; i++)
+    	{
+    		openChannel(getChannel(systemSensors[i].sensorPtr));
+    		systemSensors[i].sensorData = readSensorData(&systemSensors[i]);
+
+        	printf("Writing: %f\n", systemSensors[i].sensorData);
+        
+        	UA_Variant_setScalar(&value, &sensorData, &UA_TYPES[UA_TYPES_UINT64]);
+        	UA_Client_writeValueAttribute(pClient, nodeId, &value);
+    	}
+
+        osDelay(SAMPLING_TIME);
     }
     /* USER CODE END StartDefaultTask */
 }
